@@ -191,10 +191,8 @@ function Door2(number, onUnlock) {
     }
 
     function onBarPointerLost(e) {
-        /** Safari fires the events on progress element
-         * TODO Find a cleaner solution
-         */
         if (e.target.classList.contains('door-second__progress')) {
+            e.target.style.height = '0px';
             return;
         }
 
