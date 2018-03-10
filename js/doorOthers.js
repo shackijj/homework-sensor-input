@@ -69,12 +69,44 @@ function getOffsetProps(e) {
 }
 
 /**
- * @class Door1
+ * @class Door2
  * @augments DoorBase
  * @param {Number} number
  * @param {Function} onUnlock
  */
 function Door1(number, onUnlock) {
+    DoorBase.apply(this, arguments);
+
+    var path = this.popup.querySelector('.door-third__path');
+
+    path.addEventListener('pointerdown', function (e) {
+        path.releasePointerCapture(e.pointerId);
+        var op = getOffsetProps(e);
+
+        if (op.x < 40 && op.y < 75) {
+            this.popup.classList.add('door-third__path_started');
+        }
+    }.bind(this));
+
+    path.addEventListener('pointerout', function (e) {
+        var op = getOffsetProps(e);
+        if (this.popup.classList.contains('door-third__path_started') && op.x < 30 && op.y > 160 && op.y < 200) {
+            this.unlock();
+        } else {
+            this.popup.classList.remove('door-third__path_started');
+        }
+    }.bind(this));
+}
+Door1.prototype = Object.create(DoorBase.prototype);
+Door1.prototype.constructor = DoorBase;
+
+/**
+ * @class Door1
+ * @augments DoorBase
+ * @param {Number} number
+ * @param {Function} onUnlock
+ */
+function Door2(number, onUnlock) {
     DoorBase.apply(this, arguments);
 
     this.bars = [
@@ -85,19 +117,19 @@ function Door1(number, onUnlock) {
 
     function onBarPoinerDown(e) {
         var bar = e.target;
-        var offsetProps = getOffsetProps(e);
-        if (!bar.classList.contains('door-second__bar_started') && offsetProps.y < 20) {
+        var op = getOffsetProps(e);
+        if (!bar.classList.contains('door-second__bar_started') && op.y < 20) {
             bar.classList.add('door-second__bar_started');
         }
     }
 
     function onBarPoinerMove(e) {
         var bar = e.target;
-        var offsetProps = getOffsetProps(e);
+        var op = getOffsetProps(e);
         if (bar.classList.contains('door-second__bar_started')) {
-            bar.querySelector('.door-second__progress').style.height = offsetProps.y + 'px';
+            bar.querySelector('.door-second__progress').style.height = op.y + 'px';
         }
-        if (offsetProps.y > 180) {
+        if (op.y > 180) {
             bar.classList.add('door-second__bar_finished');
         }
     }
@@ -123,9 +155,9 @@ function Door1(number, onUnlock) {
 
     function onBarPointerLost(e) {
         var bar = e.target;
-        var offsetProps = getOffsetProps(e);
+        var op = getOffsetProps(e);
 
-        if (offsetProps.y < 180) {
+        if (op.y < 180) {
             bar.querySelector('.door-second__progress').style.height = '0px';
         }
         checkCondition.call(this, e);
@@ -140,25 +172,6 @@ function Door1(number, onUnlock) {
         bar.addEventListener('pointerleave', _onBarPointerLost);
     });
 
-}
-Door1.prototype = Object.create(DoorBase.prototype);
-Door1.prototype.constructor = DoorBase;
-
-/**
- * @class Door2
- * @augments DoorBase
- * @param {Number} number
- * @param {Function} onUnlock
- */
-function Door2(number, onUnlock) {
-    DoorBase.apply(this, arguments);
-
-    // ==== Напишите свой код для открытия третей двери здесь ====
-    // Для примера дверь откроется просто по клику на неё
-    this.popup.addEventListener('click', function () {
-        this.unlock();
-    }.bind(this));
-    // ==== END Напишите свой код для открытия третей двери здесь ====
 }
 Door2.prototype = Object.create(DoorBase.prototype);
 Door2.prototype.constructor = DoorBase;

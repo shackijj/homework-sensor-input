@@ -209,3 +209,10 @@ body {
     height: 0px;
     border-radius: 64px;
 }
+
+.door-third {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+}
