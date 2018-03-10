@@ -158,9 +158,8 @@ body {
 .popup__content_level_2 {
     /* Можно поставить какую-нибудь свою картинку двери на бек */
 }
-.popup__content_level_3 {
-    background-image: url(../img/door__box.png);
-    background-size: contain;
+.popup__content_level_0 {
+    background: #000;
 }
 
 .door-riddle {
@@ -210,9 +209,29 @@ body {
     border-radius: 64px;
 }
 
+.door-first {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+}
+
 .door-third {
     display: flex;
     align-items: center;
     justify-content: space-around;
     height: 100%;
+}
+
+.door-third__puzzle {
+    width: 240px;
+    height: 240px;
+    box-shadow: 0px 0px 3px 0px #fff;
+}
+
+.door-third__cell {
+    float: left;
+    width: 80px;
+    height: 80px;
+    background-image: url(../img/door__box.png);
 }

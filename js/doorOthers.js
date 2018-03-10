@@ -1,3 +1,53 @@
+/**
+ * @param {event}
+ * @return {{x: number, y: number}}
+ */
+function getOffsetProps(e) {
+    var rect;
+    if (!e.offsetX) {
+        rect = e.target.getBoundingClientRect();
+    }
+    return {
+        x: e.offsetX || e.clientX - rect.x,
+        y: e.offsetY || e.clientY - rect.y,
+    };
+}
+
+/**
+ * @see https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array/25984542
+ * @param {Array} array
+ * @return {Array}
+ */
+function shuffle(array) {
+    var currentIndex = array.length;
+    var temporaryValue;
+    var randomIndex;
+
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
+/**
+ *
+ * @param {Node} a
+ * @param {Node} b
+ */
+function swapDOMNodes(a, b) {
+    var parent = a.parentNode;
+    var temp = document.createElement('div');
+    parent.insertBefore(temp, a);
+    parent.replaceChild(a, b);
+    parent.replaceChild(b, temp);
+}
+
 // ===================== Пример кода первой двери =======================
 /**
  * @class Door0
@@ -53,20 +103,6 @@ Door0.prototype = Object.create(DoorBase.prototype);
 Door0.prototype.constructor = DoorBase;
 // END ===================== Пример кода первой двери =======================
 
-/**
- * @param {event}
- * @return {{x: number, y: number}}
- */
-function getOffsetProps(e) {
-    var rect;
-    if (!e.offsetX) {
-        rect = e.target.getBoundingClientRect();
-    }
-    return {
-        x: e.offsetX || e.clientX - rect.x,
-        y: e.offsetY || e.clientY - rect.y,
-    };
-}
 
 /**
  * @class Door2
@@ -77,23 +113,23 @@ function getOffsetProps(e) {
 function Door1(number, onUnlock) {
     DoorBase.apply(this, arguments);
 
-    var path = this.popup.querySelector('.door-third__path');
+    var path = this.popup.querySelector('.door-first__path');
 
     path.addEventListener('pointerdown', function (e) {
         path.releasePointerCapture(e.pointerId);
         var op = getOffsetProps(e);
 
         if (op.x < 40 && op.y < 75) {
-            this.popup.classList.add('door-third__path_started');
+            this.popup.classList.add('door-first__path_started');
         }
     }.bind(this));
 
     path.addEventListener('pointerout', function (e) {
         var op = getOffsetProps(e);
-        if (this.popup.classList.contains('door-third__path_started') && op.x < 30 && op.y > 160 && op.y < 200) {
+        if (this.popup.classList.contains('door-first__path_started') && op.x < 30 && op.y > 160 && op.y < 200) {
             this.unlock();
         } else {
-            this.popup.classList.remove('door-third__path_started');
+            this.popup.classList.remove('door-first__path_started');
         }
     }.bind(this));
 }
@@ -186,11 +222,54 @@ Door2.prototype.constructor = DoorBase;
 function Box(number, onUnlock) {
     DoorBase.apply(this, arguments);
 
-    // ==== Напишите свой код для открытия сундука здесь ====
-    // Для примера сундук откроется просто по клику на него
-    this.popup.addEventListener('click', function () {
-        this.unlock();
-    }.bind(this));
+    var puzzle = this.popup.querySelector('.door-third__puzzle');
+    var rows = 3;
+    var cols = 3;
+    var cellSideLen = 80;
+    var fragment = document.createDocumentFragment();
+
+    var cellStart;
+    var elements = [];
+
+    for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+            var el = document.createElement('div');
+            el.classList.add('door-third__cell');
+            el.setAttribute('data-position', r * rows + c);
+            el.style.backgroundPositionX = (-1 * c * cellSideLen) + 'px';
+            el.style.backgroundPositionY = (-1 * r * cellSideLen) + 'px';
+            elements.push(el);
+        }
+    }
+
+    shuffle(elements).forEach(function (element) {
+        fragment.appendChild(element);
+    });
+
+
+    function checkCondition() {
+        var cells = puzzle.querySelectorAll('.door-third__cell');
+        var prevPos = parseInt(cells[0].dataset.position, 10);
+        var curPos;
+        for (var i = 1; i < cells.length; i++) {
+            curPos = parseInt(cells[i].dataset.position, 10);
+            if (curPos < prevPos) {
+                return;
+            }
+        }
+    }
+
+    puzzle.addEventListener('pointerdown', function (e) {
+        e.target.releasePointerCapture(e.pointerId);
+        cellStart = e.target;
+    });
+    puzzle.addEventListener('pointerup', function (e) {
+        var cellEnd = e.target;
+        swapDOMNodes(cellStart, cellEnd);
+    });
+
+    puzzle.appendChild(fragment);
+
     // ==== END Напишите свой код для открытия сундука здесь ====
 
     this.showCongratulations = function () {
