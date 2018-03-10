@@ -1,0 +1,8 @@
+{
+    "extends": "yandex",
+    "rules": {
+        "vars-on-top": "off",
+        "one-var": "off",
+        "no-inner-declarations": "off"
+    }
+}
