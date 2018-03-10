@@ -222,7 +222,9 @@ Door2.prototype.constructor = DoorBase;
 function Box(number, onUnlock) {
     DoorBase.apply(this, arguments);
 
-    var puzzle = this.popup.querySelector('.door-third__puzzle');
+    this.puzzle = this.popup.querySelector('.door-third__puzzle');
+    this.cellStart = null;
+
     var rows = 3;
     var cols = 3;
     var cellSideLen = 80;
@@ -248,7 +250,7 @@ function Box(number, onUnlock) {
 
 
     function checkCondition() {
-        var cells = puzzle.querySelectorAll('.door-third__cell');
+        var cells = this.puzzle.querySelectorAll('.door-third__cell');
         var prevPos = parseInt(cells[0].dataset.position, 10);
         var curPos;
         for (var i = 1; i < cells.length; i++) {
@@ -256,19 +258,25 @@ function Box(number, onUnlock) {
             if (curPos < prevPos) {
                 return;
             }
+            prevPos = curPos;
         }
+        setTimeout(function () {
+            this.unlock();
+        }.bind(this), 100);
     }
 
-    puzzle.addEventListener('pointerdown', function (e) {
+    function onPointerDown(e) {
         e.target.releasePointerCapture(e.pointerId);
-        cellStart = e.target;
-    });
-    puzzle.addEventListener('pointerup', function (e) {
-        var cellEnd = e.target;
-        swapDOMNodes(cellStart, cellEnd);
-    });
+        this.cellStart = e.target;
+    }
+    function onPointerUp(e) {
+        swapDOMNodes(this.cellStart, e.target);
+        checkCondition.apply(this);
+    }
 
-    puzzle.appendChild(fragment);
+    this.puzzle.addEventListener('pointerdown', onPointerDown.bind(this));
+    this.puzzle.addEventListener('pointerup', onPointerUp.bind(this));
+    this.puzzle.appendChild(fragment);
 
     // ==== END Напишите свой код для открытия сундука здесь ====
 
