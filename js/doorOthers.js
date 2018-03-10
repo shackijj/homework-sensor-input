@@ -1,3 +1,4 @@
+
 /**
  * @param {event}
  * @return {{x: number, y: number}}
@@ -190,6 +191,10 @@ function Door2(number, onUnlock) {
     }
 
     function onBarPointerLost(e) {
+        if (e.target.classList.contains('door-second__progress')) {
+            return;
+        }
+
         var bar = e.target;
         var op = getOffsetProps(e);
 
