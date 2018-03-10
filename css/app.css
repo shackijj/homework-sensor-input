@@ -147,18 +147,7 @@ body {
     cursor: pointer;
 }
 
-.popup__content_level_0 {
-    /* Можно поставить какую-нибудь свою картинку двери на бек */
-}
-
-.popup__content_level_1 {
-    /* Можно поставить какую-нибудь свою картинку двери на бек */
-}
-
-.popup__content_level_2 {
-    /* Можно поставить какую-нибудь свою картинку двери на бек */
-}
-.popup__content_level_0 {
+.popup__content_level_3 {
     background: #000;
 }
 
