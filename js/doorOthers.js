@@ -55,12 +55,17 @@ Door0.prototype.constructor = DoorBase;
 
 /**
  * @param {event}
+ * @return {{x: number, y: number}}
  */
-function fixSafariOffsetProps(e) {
-    var rect = e.target.getBoundingClientRect();
-    e.offsetX = e.offsetX || e.clientX - rect.x;
-    e.offsetY = e.offsetY || e.clientY - rect.y;
-    return e;
+function getOffsetProps(e) {
+    var rect;
+    if (!e.offsetX) {
+        rect = e.target.getBoundingClientRect();
+    }
+    return {
+        x: e.offsetX || e.clientX - rect.x,
+        y: e.offsetY || e.clientY - rect.y,
+    };
 }
 
 /**
@@ -72,33 +77,70 @@ function fixSafariOffsetProps(e) {
 function Door1(number, onUnlock) {
     DoorBase.apply(this, arguments);
 
-    // ==== Напишите свой код для открытия второй двери здесь ====
-    // Для примера дверь откроется просто по клику на неё
-    this.bar = this.popup.querySelector('.door-second__bar');
-    this.bar.addEventListener('pointerdown', function (e) {
-        fixSafariOffsetProps(e);
-        if (!this.bar.classList.contains('door-second__bar_started') && e.offsetX < 20) {
-            this.bar.classList.add('door-second__bar_started');
+    this.bars = [
+        this.popup.querySelector('.door-second__bar_0'),
+        this.popup.querySelector('.door-second__bar_1'),
+    ];
+
+    this.progress = this.popup.querySelector('.door-second__progress');
+
+    function onBarPoinerDown(e) {
+        var bar = e.target;
+        var offsetProps = getOffsetProps(e);
+        if (!bar.classList.contains('door-second__bar_started') && offsetProps.y < 20) {
+            bar.classList.add('door-second__bar_started');
         }
-    }.bind(this));
+    }
+
+    function onBarPoinerMove(e) {
+        var bar = e.target;
+        var offsetProps = getOffsetProps(e);
+        if (bar.classList.contains('door-second__bar_started')) {
+            bar.querySelector('.door-second__progress').style.height = offsetProps.y + 'px';
+        }
+        if (offsetProps.y > 180) {
+            bar.classList.add('door-second__bar_finished');
+        }
+    }
 
     function checkCondition(e) {
-        fixSafariOffsetProps(e);
-        if (this.bar.classList.contains('door-second__bar_started') && e.offsetX > 180) {
-            this.unlock();
+        var isOpened = true;
+        this.bars.forEach(function (bar) {
+            if (!bar.classList.contains('door-second__bar_finished')) {
+                isOpened = false;
+            }
+        });
+        if (isOpened) {
+            if (this.isLocked) {
+                this.unlock();
+            }
+        } else {
+            this.bars.forEach(function (bar) {
+                bar.classList.remove('door-second__bar_finished');
+                bar.querySelector('.door-second__progress').style.height = '0px';
+            });
         }
-        this.bar.classList.remove('door-second__bar_started');
     }
 
     function onBarPointerLost(e) {
+        var bar = e.target;
+        var offsetProps = getOffsetProps(e);
+
+        if (offsetProps.y < 180) {
+            bar.querySelector('.door-second__progress').style.height = '0px';
+        }
         checkCondition.call(this, e);
     }
 
     var _onBarPointerLost = onBarPointerLost.bind(this);
 
-    this.bar.addEventListener('pointerup', _onBarPointerLost);
-    this.bar.addEventListener('pointerleave', _onBarPointerLost);
-    // ==== END Напишите свой код для открытия второй двери здесь ====
+    this.bars.forEach(function (bar) {
+        bar.addEventListener('pointerdown', onBarPoinerDown.bind(this));
+        bar.addEventListener('pointermove', onBarPoinerMove.bind(this));
+        bar.addEventListener('pointerup', _onBarPointerLost);
+        bar.addEventListener('pointerleave', _onBarPointerLost);
+    });
+
 }
 Door1.prototype = Object.create(DoorBase.prototype);
 Door1.prototype.constructor = DoorBase;

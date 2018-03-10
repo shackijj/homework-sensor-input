@@ -193,14 +193,19 @@ body {
 }
 
 .door-second__bar {
-    width: 200px;
-    height: 80px;
+    width: 80px;
+    height: 200px;
     border-radius: 64px;
     background-color: #583319;
     border: 1px solid #F3E9E0;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, .4);
+    overflow: hidden;
     touch-action: none;
 }
 
-.door-second__bar_started {
+.door-second__progress {
     background-color: #F3E5D9;
+    width: 80px;
+    height: 0px;
+    border-radius: 64px;
 }
