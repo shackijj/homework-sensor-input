@@ -82,7 +82,6 @@ function Door1(number, onUnlock) {
         this.popup.querySelector('.door-second__bar_1'),
     ];
 
-    this.progress = this.popup.querySelector('.door-second__progress');
 
     function onBarPoinerDown(e) {
         var bar = e.target;
@@ -135,8 +134,8 @@ function Door1(number, onUnlock) {
     var _onBarPointerLost = onBarPointerLost.bind(this);
 
     this.bars.forEach(function (bar) {
-        bar.addEventListener('pointerdown', onBarPoinerDown.bind(this));
-        bar.addEventListener('pointermove', onBarPoinerMove.bind(this));
+        bar.addEventListener('pointerdown', onBarPoinerDown);
+        bar.addEventListener('pointermove', onBarPoinerMove);
         bar.addEventListener('pointerup', _onBarPointerLost);
         bar.addEventListener('pointerleave', _onBarPointerLost);
     });
